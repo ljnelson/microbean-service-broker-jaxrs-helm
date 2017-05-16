@@ -111,7 +111,7 @@
       <dependency>
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-core-bom</artifactId>
-        <version>3.0.0.CR2</version>
+        <version>3.0.0.Final</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -119,7 +119,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-configuration-cdi</artifactId>
-        <version>0.1.4</version>
+        <version>0.1.5</version>
         <type>jar</type>
       </dependency>
       
@@ -490,7 +490,7 @@
                   <user>microbean:microbean</user>
                 </assembly>
                 <env>
-                  <JAVA_OPTS>-Dport=${port} -Dorg.jboss.weld.se.shutdownHook=false -Dorg.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi=${org.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi} ${javaOpts}</JAVA_OPTS>
+                  <JAVA_OPTS>-Dport=${port} -Dorg.jboss.weld.se.shutdownHook=false -Dorg.jboss.logging.provider=slf4j -Dorg.slf4j.simpleLogger.log.org.jboss.weld=${org.slf4j.simpleLogger.log.org.jboss.weld} -Dorg.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi=${org.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi} ${javaOpts}</JAVA_OPTS>
                 </env>
                 <optimise>true</optimise>
                 <workdir>/home/microbean</workdir>
