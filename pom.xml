@@ -178,11 +178,11 @@
         <version>0.1.0-SNAPSHOT</version>
         <type>jar</type>
       </dependency>
-      
+
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>1.7.25</version>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.2</version>
         <type>jar</type>
       </dependency>
       
@@ -246,6 +246,13 @@
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <type>jar</type>
+      <scope>runtime</scope>
+    </dependency>
+    
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
@@ -385,14 +392,7 @@
       <type>jar</type>
       <scope>runtime</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <type>jar</type>
-      <scope>runtime</scope>
-    </dependency>
-    
+        
     <!-- Test-scoped dependencies. -->
     
     <dependency>
@@ -405,6 +405,17 @@
   </dependencies>
 
   <build>
+
+    <resources>
+      <resource>
+        <targetPath>${project.build.directory}</targetPath>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>logback.xml</include>
+          <include>logging.properties</include>
+        </includes>
+      </resource>
+    </resources>
 
     <pluginManagement>
       <plugins>
@@ -457,6 +468,7 @@
               <enricher>
                 <config>
                   <fmp-controller>
+                    <pullPolicy>${imagePullPolicy}</pullPolicy>
                     <replicaCount>${replicaCount}</replicaCount>
                   </fmp-controller>
                   <fmp-service>
@@ -501,6 +513,16 @@
                 </labels>
                 <assembly>
                   <inline>
+                    <files>
+                      <file>
+                        <source>${project.build.directory}/logback.xml</source>
+                        <outputDirectory/>
+                      </file>
+                      <file>
+                        <source>${project.build.directory}/logging.properties</source>
+                        <outputDirectory/>
+                      </file>
+                    </files>
                     <repositories>
                       <repository>
                         <includeMetadata>false</includeMetadata>
@@ -511,8 +533,8 @@
                   <targetDir>/home/microbean</targetDir>
                   <user>microbean:microbean</user>
                 </assembly>
-                <env>
-                  <JAVA_OPTS>-Dport=${port} -Dorg.jboss.weld.se.shutdownHook=false -Dorg.jboss.logging.provider=slf4j -Dorg.slf4j.simpleLogger.log.org.jboss.weld=${org.slf4j.simpleLogger.log.org.jboss.weld} -Dorg.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi=${org.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi} ${javaOpts}</JAVA_OPTS>
+                <env>                  
+                  <JAVA_OPTS>-Dport=${port} -Djava.util.logging.config.file=logging.properties -Dorg.jboss.weld.se.shutdownHook=false -Dorg.jboss.logging.provider=slf4j -Dlogback.configurationFile=logback.xml ${javaOpts}</JAVA_OPTS>
                 </env>
                 <optimise>true</optimise>
                 <workdir>/home/microbean</workdir>
@@ -532,8 +554,6 @@
         <configuration>
           <systemPropertyVariables>
             <org.jboss.logging.provider>${org.jboss.logging.provider}</org.jboss.logging.provider>
-            <org.slf4j.simpleLogger.log.org.jboss.weld>${org.slf4j.simpleLogger.log.org.jboss.weld}</org.slf4j.simpleLogger.log.org.jboss.weld>
-            <org.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi>${org.slf4j.simpleLogger.log.org.microbean}</org.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi>
           </systemPropertyVariables>
         </configuration>
       </plugin>
@@ -546,6 +566,7 @@
     <!-- Properties used to assemble and configure Docker images -->
     <baseImageName>microbean/helm:2.4.1</baseImageName>
     <imageName>microbean/service-broker-jaxrs-helm</imageName>
+    <imagePullPolicy>Always</imagePullPolicy>
     <javaOpts/>
     <kubernetesServiceType>NodePort</kubernetesServiceType>
     <maintainer>Laird Nelson &lt;ljnelson@gmail.com&gt;</maintainer>
@@ -577,15 +598,13 @@
     <goals>deploy,site-deploy</goals>
 
     <!-- maven-resources-plugin properties; see https://maven.apache.org/plugins/maven-resources-plugin/resources-mojo.html -->
-    <maven.resources.skip>true</maven.resources.skip>
+    <maven.resources.skip>false</maven.resources.skip>
 
     <!-- nexus-staging-plugin properties; see https://github.com/sonatype/nexus-maven-plugins/blob/nexus-maven-plugins-1.6.8/staging/maven-plugin/src/main/java/org/sonatype/nexus/maven/staging/deploy/DeployMojo.java#L86-L90 -->
     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     
     <!-- Weld logging; see https://docs.jboss.org/weld/reference/latest/en-US/html/logging.html#_weld_se -->
     <org.jboss.logging.provider>slf4j</org.jboss.logging.provider>
-    <org.slf4j.simpleLogger.log.org.jboss.weld>info</org.slf4j.simpleLogger.log.org.jboss.weld>
-    <org.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi>info</org.slf4j.simpleLogger.log.org.microbean.jersey.container.grizzly2.http.cdi>
     
   </properties>
   
