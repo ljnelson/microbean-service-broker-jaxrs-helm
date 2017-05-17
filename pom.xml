@@ -564,7 +564,8 @@
   <properties>
 
     <!-- Properties used to assemble and configure Docker images -->
-    <baseImageName>microbean/helm:2.4.1</baseImageName>
+    <baseImageName>microbean/helm:${helmVersion}</baseImageName>
+    <helmVersion>2.4.1</helmVersion>
     <imageName>microbean/service-broker-jaxrs-helm</imageName>
     <imagePullPolicy>Always</imagePullPolicy>
     <javaOpts/>
