@@ -167,6 +167,13 @@
 
       <dependency>
         <groupId>org.microbean</groupId>
+        <artifactId>microbean-service-broker-helm-credentials-extractors</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.microbean</groupId>
         <artifactId>microbean-service-broker-jaxrs</artifactId>
         <version>0.1.0-SNAPSHOT</version>
         <type>jar</type>
@@ -367,6 +374,13 @@
 
     <dependency>
       <groupId>org.microbean</groupId>
+      <artifactId>microbean-service-broker-helm-credentials-extractors</artifactId>
+      <type>jar</type>
+      <scope>runtime</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.microbean</groupId>
       <artifactId>microbean-service-broker-jaxrs</artifactId>
       <type>jar</type>
       <scope>runtime</scope>
@@ -398,7 +412,7 @@
         <plugin>
           <groupId>io.fabric8</groupId>
           <artifactId>fabric8-maven-plugin</artifactId>
-          <version>3.3.5</version>
+          <version>3.4.0</version>
         </plugin>
         
       </plugins>
@@ -440,13 +454,14 @@
               <goal>resource</goal>
             </goals>
             <configuration>
-              <enricher> 
-                <excludes> 
-                  <exclude>fmp-project</exclude>
-                </excludes>
+              <enricher>
                 <config>
+                  <fmp-controller>
+                    <replicaCount>${replicaCount}</replicaCount>
+                  </fmp-controller>
                   <fmp-service>
                     <port>${port}</port>
+                    <type>${kubernetesServiceType}</type>
                   </fmp-service>
                 </config>
               </enricher>
@@ -464,6 +479,13 @@
             <phase>install</phase>
             <goals>
               <goal>push</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>Apply Kubernetes resouces</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>apply</goal>
             </goals>
           </execution>
         </executions>
@@ -522,12 +544,13 @@
   <properties>
 
     <!-- Properties used to assemble and configure Docker images -->
-    <helmVersion>2.4.1</helmVersion>
-    <javaOpts/>
-    <port>8080</port>
-    <imageName>microbean/service-broker-jaxrs-helm</imageName>
     <baseImageName>microbean/helm:2.4.1</baseImageName>
+    <imageName>microbean/service-broker-jaxrs-helm</imageName>
+    <javaOpts/>
+    <kubernetesServiceType>NodePort</kubernetesServiceType>
     <maintainer>Laird Nelson &lt;ljnelson@gmail.com&gt;</maintainer>
+    <port>8080</port>
+    <replicaCount>1</replicaCount>
 
     <!-- fabric8-maven-plugin properties; see https://maven.fabric8.io/#goals-overview-build -->
     <docker.skip.build>false</docker.skip.build>
@@ -555,6 +578,9 @@
 
     <!-- maven-resources-plugin properties; see https://maven.apache.org/plugins/maven-resources-plugin/resources-mojo.html -->
     <maven.resources.skip>true</maven.resources.skip>
+
+    <!-- nexus-staging-plugin properties; see https://github.com/sonatype/nexus-maven-plugins/blob/nexus-maven-plugins-1.6.8/staging/maven-plugin/src/main/java/org/sonatype/nexus/maven/staging/deploy/DeployMojo.java#L86-L90 -->
+    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     
     <!-- Weld logging; see https://docs.jboss.org/weld/reference/latest/en-US/html/logging.html#_weld_se -->
     <org.jboss.logging.provider>slf4j</org.jboss.logging.provider>
