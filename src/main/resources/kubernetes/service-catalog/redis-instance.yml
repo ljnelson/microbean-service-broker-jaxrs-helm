@@ -6,3 +6,6 @@ metadata:
 spec:
   serviceClassName: stable--redis
   planName: free--stable--redis
+  parameters:
+    persistence:
+      enabled: false
