@@ -7,5 +7,7 @@ spec:
   serviceClassName: stable--redis
   planName: free--stable--redis
   parameters:
+    helm:
+      namespace: microbean
     persistence:
       enabled: false
