@@ -133,14 +133,14 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jersey-container-grizzly2-http-cdi-extension</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jersey-container-grizzly2-http-cdi</artifactId>
-        <version>0.2.2</version>
+        <version>0.2.3</version>
         <type>jar</type>
       </dependency>
       
@@ -421,6 +421,12 @@
       <plugins>
 
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
+        </plugin>
+        
+        <plugin>
           <groupId>io.fabric8</groupId>
           <artifactId>fabric8-maven-plugin</artifactId>
           <version>3.4.0</version>
@@ -535,7 +541,7 @@
                   <user>microbean:microbean</user>
                 </assembly>
                 <env>                  
-                  <JAVA_OPTS>-Dport=${port} -Djava.util.logging.config.file=logging.properties -Dorg.jboss.weld.se.shutdownHook=false -Dorg.jboss.logging.provider=slf4j -Dlogback.configurationFile=logback.xml ${javaOpts}</JAVA_OPTS>
+                  <JAVA_OPTS>-DallowPayloadForUndefinedHttpMethods=${allowPayloadForUndefinedHttpMethods} -Dport=${port} -Djava.util.logging.config.file=logging.properties -Dorg.jboss.weld.se.shutdownHook=false -Dorg.jboss.logging.provider=slf4j -Dlogback.configurationFile=logback.xml ${javaOpts}</JAVA_OPTS>
                 </env>
                 <optimise>true</optimise>
                 <workdir>/home/microbean</workdir>
@@ -559,12 +565,43 @@
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <key>allowPayloadForUndefinedHttpMethods</key>
+              <value>${allowPayloadForUndefinedHttpMethods}</value>
+            </property>
+            <property>
+              <key>port</key>
+              <value>${port}</value>
+            </property>
+            <property>
+              <key>org.jboss.weld.se.shutdownHook</key>
+              <value>false</value>
+            </property>
+            <property>
+              <key>org.jboss.logging.provider</key>
+              <value>slf4j</value>
+            </property>
+            <property>
+              <key>logback.configurationFile</key>
+              <value>${project.build.directory}/logback.xml</value>
+            </property>
+          </systemProperties>
+          <mainClass>org.microbean.main.Main</mainClass>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
   <properties>
 
     <!-- Properties used to assemble and configure Docker images -->
+    <allowPayloadForUndefinedHttpMethods>true</allowPayloadForUndefinedHttpMethods>
     <baseImageName>microbean/helm:${helmVersion}</baseImageName>
     <helmVersion>2.4.1</helmVersion>
     <imageName>microbean/service-broker-jaxrs-helm</imageName>
